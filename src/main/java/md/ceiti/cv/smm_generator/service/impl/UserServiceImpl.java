@@ -6,11 +6,13 @@ import md.ceiti.cv.smm_generator.entity.User;
 import md.ceiti.cv.smm_generator.repository.RoleRepository;
 import md.ceiti.cv.smm_generator.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
