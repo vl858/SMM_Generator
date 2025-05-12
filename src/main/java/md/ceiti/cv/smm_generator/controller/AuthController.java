@@ -2,14 +2,16 @@ package md.ceiti.cv.smm_generator.controller;
 
 import jakarta.validation.Valid;
 import md.ceiti.cv.smm_generator.dto.UserDto;
+import md.ceiti.cv.smm_generator.entity.User;
 import md.ceiti.cv.smm_generator.service.UserService;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.List;
 
 @Controller
 public class AuthController {
@@ -30,8 +32,14 @@ public class AuthController {
         return "login";
     }
 
+    @GetMapping("/dashboard")
+    public String dashboard(){
+        return "dashboard";
+    }
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model){
+        //model object to store form data
         UserDto user = new UserDto();
         model.addAttribute("user", user);
         return "register";
@@ -55,5 +63,12 @@ public class AuthController {
 
         userService.saveUser(userDto);
         return "redirect:/register?success";
+    }
+
+    @GetMapping("/users")
+    public String users(Model model){
+        List<UserDto> users = userService.findAllUsers();
+        model.addAttribute("users", users);
+        return "users";
     }
 }

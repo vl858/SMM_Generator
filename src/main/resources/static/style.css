@@ -1,0 +1,14 @@
+body, html{
+    height: 100%;
+}
+
+.centered-container{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-brand{
+    font-weight: bold;
+}

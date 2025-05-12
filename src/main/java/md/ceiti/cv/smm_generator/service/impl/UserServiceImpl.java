@@ -1,10 +1,11 @@
-package md.ceiti.cv.smm_generator.service;
+package md.ceiti.cv.smm_generator.service.impl;
 
 import md.ceiti.cv.smm_generator.dto.UserDto;
 import md.ceiti.cv.smm_generator.entity.Role;
 import md.ceiti.cv.smm_generator.entity.User;
 import md.ceiti.cv.smm_generator.repository.RoleRepository;
 import md.ceiti.cv.smm_generator.repository.UserRepository;
+import md.ceiti.cv.smm_generator.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
