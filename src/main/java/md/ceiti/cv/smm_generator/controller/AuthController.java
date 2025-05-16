@@ -16,7 +16,7 @@ import java.util.List;
 @Controller
 public class AuthController {
 
-    private UserService userService;
+    private final UserService userService;
 
     public AuthController(UserService userService) {
         this.userService = userService;
@@ -44,7 +44,6 @@ public class AuthController {
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model){
-        //model object to store form data
         UserDto user = new UserDto();
         model.addAttribute("user", user);
         return "register";
@@ -57,7 +56,7 @@ public class AuthController {
         User existingUser = userService.findUserByEmail(userDto.getEmail());
 
         if(existingUser != null && existingUser.getEmail() != null && !existingUser.getEmail().isEmpty()){
-            result.rejectValue("email", null,
+            result.rejectValue("email", "error.user",
                     "There is already an account registered with the same email");
         }
 
