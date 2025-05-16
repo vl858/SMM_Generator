@@ -14,9 +14,9 @@ import lombok.Setter;
 public class UserDto {
 
     private Long id;
-    @NotEmpty
+    @NotEmpty(message = "Firstname should not be empty")
     private String firstName;
-    @NotEmpty
+    @NotEmpty(message = "Lastname should not be empty")
     private String lastName;
     @NotEmpty(message = "Email should not be empty")
     @Email

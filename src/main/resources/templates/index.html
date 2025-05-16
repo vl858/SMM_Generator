@@ -4,14 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <title>SMM Generator</title>
-    <link rel="stylesheet" th:href="@{style.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
           rel="stylesheet">
 </head>
 <body>
-    <div th:replace="fragments/navbar :: navbar"></div>
+ <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-    <div class="d-flex justify-content-center align-items-center centered-content" style="height: 100vh; position: relative;">
+<div class="d-flex justify-content-center align-items-center" style="min-height: 90vh; position: relative">
         <div class="text-center">
             <h1 class="display-4">Welcome to <span class="text-primary">SMM Generator AI</span></h1>
             <p class="lead">Easily create and schedule your own AI posts</p>

@@ -37,6 +37,11 @@ public class AuthController {
         return "dashboard";
     }
 
+    @GetMapping("/post_generate")
+    public String post_generate(){
+        return "post_generate";
+    }
+
     @GetMapping("/register")
     public String showRegistrationForm(Model model){
         //model object to store form data
