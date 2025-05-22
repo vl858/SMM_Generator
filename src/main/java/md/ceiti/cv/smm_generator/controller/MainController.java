@@ -1,6 +1,5 @@
 package md.ceiti.cv.smm_generator.controller;
 
-import md.ceiti.cv.smm_generator.entity.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
