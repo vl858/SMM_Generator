@@ -9,6 +9,8 @@ public interface UserService {
 
     void saveUser(UserDto userDto);
 
+    void saveAdmin(UserDto userDto);
+
     User findUserByEmail(String email);
 
     List<UserDto> findAllUsers();

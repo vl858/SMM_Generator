@@ -14,10 +14,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
-public class SpringSecurity {
+public class SpringSecurity{
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
+
+    public SpringSecurity(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     public static PasswordEncoder passwordEncoder(){
@@ -27,14 +30,17 @@ public class SpringSecurity {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests((authorize) ->
-                        authorize.requestMatchers("/register/**", "/login", "/dashboard","/images/**","/index", "/css/**", "/js/**", "/post_generate").permitAll()
-                                .requestMatchers("/users").hasRole("ADMIN")
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers("/", "/index", "/register/**", "/login",
+                                "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/users/**").hasRole("USER")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 ).formLogin(
                         form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/dashboard", true)
+                                .defaultSuccessUrl("/default", true)
                                 .permitAll()
                 ).logout(
                         logout -> logout

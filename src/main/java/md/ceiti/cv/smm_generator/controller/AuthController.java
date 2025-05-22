@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
-
 @Controller
 public class AuthController {
 
@@ -22,31 +20,16 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @GetMapping("/index")
-    public String home(){
-        return "index";
-    }
-
     @GetMapping("/login")
     public String login(){
-        return "login";
-    }
-
-    @GetMapping("/dashboard")
-    public String dashboard(){
-        return "dashboard";
-    }
-
-    @GetMapping("/post_generate")
-    public String post_generate(){
-        return "post_generate";
+        return "auth/login";
     }
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model){
         UserDto user = new UserDto();
         model.addAttribute("user", user);
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping("/register/save")
@@ -62,17 +45,10 @@ public class AuthController {
 
         if(result.hasErrors()){
             model.addAttribute("user", userDto);
-            return "/register";
+            return "auth/register";
         }
 
         userService.saveUser(userDto);
         return "redirect:/register?success";
-    }
-
-    @GetMapping("/users")
-    public String users(Model model){
-        List<UserDto> users = userService.findAllUsers();
-        model.addAttribute("users", users);
-        return "users";
     }
 }

@@ -11,18 +11,12 @@
 
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-2 sidebar">
-      <br>
-      <a href="#" class="active">Posts</a>
-      <a href="#">Calendar</a>
-      <a href="#">Socials</a>
-      <a href="#">Settings</a>
-    </div>
 
+  <div th:replace="~{fragments/sidebar :: sidebar}"> </div>
     <div class="col-md-10 content content-wrapper align-items-center">
       <div class="post-preview mb-4 d-flex align-items-center justify-content-between w-100">
         <div class="post-image me-4" style="flex: 0 0 45%;">
-          <img th:src="@{images/post.png}" alt="Post preview image">
+          <img th:src="@{/images/post.png}" alt="Post preview image">
         </div>
         <div class="intro-section post-text text-start">
           <h3>Create your first post</h3>
