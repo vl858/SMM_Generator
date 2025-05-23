@@ -5,7 +5,6 @@ import md.ceiti.cv.smm_generator.repository.UserRepository;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +19,7 @@ public class OAuthService {
     }
 
     public void saveFacebookToken(OAuth2AuthenticationToken authentication) {
-        OAuth2User userDetails = (OAuth2User) authentication.getPrincipal();
+        OAuth2User userDetails = authentication.getPrincipal();
         String email = userDetails.getAttribute("email");
 
         OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
