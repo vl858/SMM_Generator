@@ -17,8 +17,6 @@ import java.util.List;
 @Table(name = "users")
 public class User {
 
-    private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,6 +29,12 @@ public class User {
 
     @Column(nullable=false)
     private String password;
+
+    @Column(name = "facebook_access_token")
+    private String facebookAccessToken;
+
+    @Column(name = "instagram_access_token")
+    private String instagramAccessToken;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

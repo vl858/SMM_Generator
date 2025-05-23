@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SMM Generator</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+</head>
+<body>
+
+    <div th:replace="~{fragments/navbar :: navbar}"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+            <div class="col-md-10 content-wrapper p-4">
+                <h2 class="mb-4">Socials Accounts</h2>
+                <p class="text-muted">Connect your Facebook and/or Instagram accounts to enable post publishing</p>
+
+                <div class="card mb-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4>Facebook</h4>
+                            <p th:if="${facebookConnected}" class="text-success mb-0">Connected</p>
+                            <p th:unless="${facebookConnected}" class="text-danger mb-0">Not connected</p>
+                        </div>
+
+                        <div>
+                            <a th:if="${!facebookConnected}" href="/oauth2/authorization/facebook" class="btn btn-primary">Connect Facebook</a>
+                            <form th:if="${facebookConnected}" action="/disconnect/facebook" method="post" style="display: inline">
+                                <button type="submit" class="btn btn-outline-danger">Disconnect</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4>Instagram</h4>
+                            <p th:if="${instagramConnected}" class="text-success mb-0">Connected</p>
+                            <p th:unless="${instagramConnected}" class="text-danger mb-0">Not connected</p>
+                        </div>
+
+                        <div>
+                            <a th:if="${!instagramConnected}" href="/connect/instagram" class="btn btn-primary">Connect Instagram</a>
+                            <form th:if="${instagramConnected}" action="/disconnect/instagram" method="post" style="display: inline">
+                                <button type="submit" class="btn btn-outline-danger">Disconnect</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

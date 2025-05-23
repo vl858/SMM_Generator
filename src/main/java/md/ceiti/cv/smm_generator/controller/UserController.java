@@ -17,4 +17,14 @@ public class UserController {
     public String post_generate() {
         return "user/post_generate";
     }
+
+    @GetMapping("/calendar")
+    public String calendar() {
+        return "user/calendar";
+    }
+
+    @GetMapping("/settings")
+    public String settings() {
+        return "user/settings";
+    }
 }
