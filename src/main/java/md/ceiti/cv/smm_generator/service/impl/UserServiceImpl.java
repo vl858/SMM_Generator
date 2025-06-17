@@ -6,10 +6,13 @@ import md.ceiti.cv.smm_generator.entity.User;
 import md.ceiti.cv.smm_generator.repository.RoleRepository;
 import md.ceiti.cv.smm_generator.repository.UserRepository;
 import md.ceiti.cv.smm_generator.service.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,21 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveAdmin(UserDto userDto)
-    {
-        User user = new User();
-        user.setName(userDto.getFirstName() + " " + userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN");
-        user.setRoles(List.of(adminRole));
-
-        userRepository.save(user);
-    }
-
-    @Override
-    public User findUserByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
@@ -73,5 +62,34 @@ public class UserServiceImpl implements UserService {
         userDto.setLastName(str[1]);
         userDto.setEmail(user.getEmail());
         return userDto;
+    }
+
+    @Override
+    public void updatePassword(String email, String newPassword) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        });
+    }
+
+    @Override
+    public void deleteUser(String email) {
+        userRepository.findByEmail(email).ifPresent(userRepository::delete);
+    }
+
+    @Override
+    public boolean verifyPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
+
+    @Override
+    public Optional<User> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Optional.empty();
+        }
+
+        String email = authentication.getName();
+        return userRepository.findByEmail(email);
     }
 }

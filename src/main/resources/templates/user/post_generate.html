@@ -3,61 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <title>SMM Generator</title>
-    <link rel="stylesheet" th:href="@{/css/posts_style.css}">
+    <link rel="stylesheet" th:href="@{/css/post_generate.css}">
+    <link rel="stylesheet" th:href="@{/css/sidebar.css}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <div class="container-fluid">
     <div class="row">
-
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
-        <div class="col-md-10 content content-wrapper">
+        <div class="col-md-10 content-wrapper">
+            <!-- Formular generare -->
             <div class="generate-container">
                 <h2 class="mb-3">Generate AI-Powered Post</h2>
-                <form th:action="@{/generate-posts}" method="post">
+                <div th:if="${facebookTokenExpired}" class="alert alert-warning">
+                    Your Facebook token has expired.
+                    <a th:href="@{/reauth/facebook}" class="alert-link">Click here to reconnect Facebook</a>.
+                </div>
+
+                <div id="formAlert" class="alert alert-danger d-none" role="alert"></div>
+
+                <form id="generateForm" th:action="@{/generate-posts}" method="post">
                     <div class="mb-3">
                         <label for="topic" class="form-label">Post Topic*</label>
                         <input type="text" class="form-control" id="topic" name="topic" placeholder="e.g., Coffee shop, Product launch">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Platforms</label><br>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="platforms" value="facebook" id="facebook">
-                            <label class="form-check-label" for="facebook">Facebook</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="checkbox" name="platforms" value="instagram" id="instagram">
-                            <label class="form-check-label" for="instagram">Instagram</label>
-                        </div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Generate 3 AI Posts</button>
                 </form>
             </div>
 
-            <div class="results-wrapper" th:if="${posts != null}">
+            <!-- Afișare postări generate -->
+            <div class="results-wrapper mt-4" th:if="${posts != null and !posts.isEmpty()}">
                 <h4 class="mb-4">Choose your favorite AI-generated post</h4>
                 <div class="row g-4">
                     <div class="col-md-4" th:each="post : ${posts}">
                         <div class="card-post-result">
-                            <img th:src="${post.imageUrl}" alt="Generated Post">
-                            <p><strong th:text="${post.text}"></strong><br><small th:text="${post.hashtags}"></small></p>
-                            <form th:action="@{/publish}" method="post">
-                                <input type="hidden" name="postId" th:value="${post.id}">
-                                <button type="submit" class="btn btn-success w-100">Post</button>
-                            </form>
+                            <img th:src="${post.imageUrl}" alt="Generated Post" class="img-fluid mb-2">
+                            <p>
+                                <strong th:text="${post.text}"></strong><br>
+                                <small th:text="${post.hashtags}"></small>
+                            </p>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" th:data-bs-target="${'#editModal_' + post.id}">Edit</button>
+                                <button type="button" class="btn btn-success"
+                                        data-bs-toggle="modal"
+                                        th:data-bs-target="${'#publishModal_' + post.id}"
+                                        th:disabled="${facebookTokenExpired}">
+                                    Post
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Modaluri editare și publicare -->
+            <div th:each="post : ${posts}">
+                <!-- Modal Edit -->
+                <div th:id="${'editModal_' + post.id}" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <form th:action="@{/edit-post}" method="post">
+                                <input type="hidden" name="postId" th:value="${post.id}" />
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Edit Post</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Text</label>
+                                        <textarea name="text" class="form-control" th:text="${post.text}"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Hashtags</label>
+                                        <input name="hashtags" class="form-control" th:value="${post.hashtags}" />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Image URL</label>
+                                        <input name="imageUrl" class="form-control" th:value="${post.imageUrl}" />
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-primary">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Publish -->
+                <div th:id="${'publishModal_' + post.id}" class="modal fade" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form th:action="@{/publish}" method="post">
+                                <input type="hidden" name="postId" th:value="${post.id}" />
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Publish Post</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong th:text="${post.text}"></strong></p>
+                                    <p><small th:text="${post.hashtags}"></small></p>
+                                    <img th:src="${post.imageUrl}" class="img-fluid mb-3" alt="Generated image"/>
+
+                                    <label class="form-label">Select Platforms:</label><br>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="platforms" value="facebook" id="fb_${post.id}">
+                                        <label class="form-check-label" th:for="${'fb_' + post.id}">Facebook</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="platforms" value="instagram" id="ig_${post.id}">
+                                        <label class="form-check-label" th:for="${'ig_' + post.id}">Instagram</label>
+                                    </div>
+
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input publish-option" type="radio" name="publishOption" th:name="${'publishOption_' + post.id}" value="now" checked>
+                                        <label class="form-check-label">Publish Now</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input publish-option" type="radio" name="publishOption" th:name="${'publishOption_' + post.id}" value="schedule">
+                                        <label class="form-check-label">Schedule</label>
+                                    </div>
+
+                                    <div class="mb-3 schedule-date" style="display: none;">
+                                        <label class="form-label">Select date and time:</label>
+                                        <input type="datetime-local" name="scheduledDate" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-success">Confirm</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.querySelectorAll('.publish-option').forEach(input => {
+        input.addEventListener('change', function () {
+            const modal = this.closest('.modal');
+            const dateDiv = modal.querySelector('.schedule-date');
+            dateDiv.style.display = this.value === 'schedule' ? 'block' : 'none';
+        });
+    });
+
+    document.getElementById('generateForm').addEventListener('submit', function (e) {
+        const topic = document.getElementById('topic').value.trim();
+        const alertBox = document.getElementById('formAlert');
+
+        if (!topic) {
+            e.preventDefault();
+            alertBox.classList.remove('d-none');
+            alertBox.innerText = 'Please enter a topic.';
+        } else {
+            alertBox.classList.add('d-none');
+        }
+    });
+</script>
+
 </body>
 </html>

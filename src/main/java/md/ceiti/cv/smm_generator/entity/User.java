@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,11 +31,28 @@ public class User {
     @Column(nullable=false)
     private String password;
 
-    @Column(name = "facebook_access_token")
+    @Column(name = "facebook_page_token")
     private String facebookAccessToken;
 
-    @Column(name = "instagram_access_token")
+    @Column(name = "facebook_token_expiry")
+    private LocalDateTime facebookTokenExpiry;
+
+    @Column(length = 2048)
     private String instagramAccessToken;
+
+    @Column(name = "facebook_page_id")
+    private String facebookUserId;
+
+    @Column
+    private String instagramUserId;
+
+    @Column (nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

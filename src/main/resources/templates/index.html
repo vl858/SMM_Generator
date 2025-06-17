@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
 <head>
     <meta charset="UTF-8">
     <title>SMM Generator</title>
@@ -14,7 +14,9 @@
         <div class="text-center">
             <h1 class="display-4">Welcome to <span class="text-primary">SMM Generator AI</span></h1>
             <p class="lead">Easily create and schedule your own AI posts</p>
-            <a class="btn btn-primary" th:href="@{/register}">Get Started</a>
+
+            <a class="btn btn-primary" th:href="@{/user/dashboard}" sec:authorize="isAuthenticated()">Get Started</a>
+            <a class="btn btn-primary" th:href="@{/register}" sec:authorize="!isAuthenticated()">Get Started</a>
         </div>
     </div>
 
