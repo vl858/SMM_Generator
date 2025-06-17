@@ -1,0 +1,11 @@
+.toggle-password-icon {
+    position: absolute;
+    top: 65%;
+    right: 12px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    font-size: 1.1rem;
+    z-index: 2;
+    pointer-events: all;
+}

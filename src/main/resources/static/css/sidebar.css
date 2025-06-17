@@ -1,0 +1,17 @@
+.sidebar {
+    min-height: 90vh;
+    /*overflow: hidden;*/
+    background-color: #f1f5f9;
+    padding-top: 30px;
+}
+.sidebar a {
+    display: block;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+}
+.sidebar a:hover, .sidebar a.active {
+    background-color: #e0e7ff;
+    border-left: 4px solid #6366f1;
+    font-weight: 500;
+}

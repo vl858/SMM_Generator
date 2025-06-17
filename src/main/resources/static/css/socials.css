@@ -1,0 +1,28 @@
+.socials-wrapper {
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 50px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    height: calc(100vh - 56px);
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.card-social {
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    background-color: #fff;
+    transition: 0.3s ease;
+}
+
+.card-social:hover {
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+
+.card-social h4 {
+    font-size: 1.25rem;
+}
