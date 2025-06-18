@@ -1,11 +1,17 @@
 package md.ceiti.cv.smm_generator.service.impl;
 
+import jakarta.transaction.Transactional;
 import md.ceiti.cv.smm_generator.dto.UserDto;
 import md.ceiti.cv.smm_generator.entity.Role;
 import md.ceiti.cv.smm_generator.entity.User;
+import md.ceiti.cv.smm_generator.repository.AiPostRepository;
 import md.ceiti.cv.smm_generator.repository.RoleRepository;
 import md.ceiti.cv.smm_generator.repository.UserRepository;
 import md.ceiti.cv.smm_generator.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,13 +27,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AiPostRepository aiPostRepository;
 
     public UserServiceImpl(UserRepository userRepository,
                            RoleRepository roleRepository,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           AiPostRepository aiPostRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.aiPostRepository = aiPostRepository;
     }
 
     @Override
@@ -73,11 +82,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String email) {
-        userRepository.findByEmail(email).ifPresent(userRepository::delete);
-    }
-
-    @Override
     public boolean verifyPassword(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
@@ -91,5 +95,32 @@ public class UserServiceImpl implements UserService {
 
         String email = authentication.getName();
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            aiPostRepository.deleteAllByUser(user);
+            userRepository.delete(user);
+        }
+    }
+
+    @Override
+    public Page<UserDto> findPaginatedSorted(int page, int size, String sortField) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortField));
+        return userRepository.findAll(pageable)
+                .map(this::mapToDto);
+    }
+
+    private UserDto mapToDto(User user) {
+        UserDto dto = new UserDto();
+        dto.setFirstName(user.getName().split(" ")[0]);
+        dto.setLastName(user.getName().split(" ").length > 1 ? user.getName().split(" ")[1] : "");
+        dto.setEmail(user.getEmail());
+        return dto;
     }
 }

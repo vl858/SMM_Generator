@@ -2,13 +2,14 @@ package md.ceiti.cv.smm_generator.service;
 
 import lombok.RequiredArgsConstructor;
 import md.ceiti.cv.smm_generator.entity.AiPost;
+import md.ceiti.cv.smm_generator.entity.PostStatus;
 import md.ceiti.cv.smm_generator.entity.User;
 import md.ceiti.cv.smm_generator.repository.AiPostRepository;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class AiPostGenerationService {
     private final UserService userService;
     private final FacebookService facebookService;
     private final ImageGenerationService imageGenerationService;
+    private final ChatClient.Builder chatClientBuilder;
 
     public List<AiPost> generatePosts(String topic) {
         List<AiPost> posts = new ArrayList<>();
@@ -27,14 +29,24 @@ public class AiPostGenerationService {
         for (int i = 0; i < 3; i++) {
             String text = generatePostText(topic);
             String hashtags = generateHashtags(topic);
-            String imageUrl = imageGenerationService.generateImageUrl(topic);
+
+            String imagePrompt = "Generate an ultra-realistic photo related to: \"" + topic + "\". " +
+                    switch (i) {
+                        case 0 -> "Natural lighting, people in real-life settings.";
+                        case 1 -> "Real-world scenery, documentary-style composition, authentic background.";
+                        case 2 -> "High-resolution candid moment with vibrant colors and emotional context.";
+                        default -> "";
+                    };
+
+            String imageUrl = imageGenerationService.generateImageUrl(imagePrompt);
 
             AiPost post = AiPost.builder()
                     .text(text)
                     .hashtags(hashtags)
                     .imageUrl(imageUrl)
                     .createdDate(LocalDateTime.now())
-                    .published(false)
+                    .published(null)
+                    .status(PostStatus.DRAFT)
                     .user(currentUser)
                     .build();
 
@@ -43,12 +55,20 @@ public class AiPostGenerationService {
         return posts;
     }
 
-    private String generatePostText(String topic) {
-        return "Check out this amazing post about " + topic + "!";
+    public String generatePostText(String topic) {
+        return chatClientBuilder.build()
+                .prompt()
+                .user("Write a social media post without any hashtags about: " + topic)
+                .call()
+                .content();
     }
 
-    private String generateHashtags(String topic) {
-        return "#" + topic.toLowerCase().replace(" ", "") + " #trending #aiPost";
+    public String generateHashtags(String topic) {
+        return chatClientBuilder.build()
+                .prompt()
+                .user("Generate 5 relevant hashtags for: " + topic + ". Output as space-separated line.")
+                .call()
+                .content();
     }
 
     public void updatePost(Long postId, String text, String hashtags, String imageUrl) {
@@ -59,35 +79,21 @@ public class AiPostGenerationService {
         postRepository.save(post);
     }
 
-    public void publishPost(Long postId, List<String> platforms, String option, LocalDateTime scheduleDate) {
-        AiPost originalPost = postRepository.findById(postId).orElseThrow();
-
+    public void publishNow(AiPost post, List<String> platforms) {
         for (String platform : platforms) {
-            AiPost postToPublish = AiPost.builder()
-                    .text(originalPost.getText())
-                    .hashtags(originalPost.getHashtags())
-                    .imageUrl(originalPost.getImageUrl())
-                    .platform(platform)
-                    .createdDate(LocalDateTime.now())
-                    .scheduledDate("schedule".equals(option) ? scheduleDate : null)
-                    .published("now".equals(option))
-                    .user(originalPost.getUser())
-                    .build();
-
-            postRepository.save(postToPublish);
-
-            if ("now".equals(option)) {
-                if ("facebook".equalsIgnoreCase(platform)) {
-                    facebookService.postToFacebook(postToPublish);
-                }
-                // You can add future logic for Instagram here
+            if ("facebook".equalsIgnoreCase(platform)) {
+                facebookService.postToFacebook(post);
             }
         }
+
+        post.setPublished(LocalDateTime.now());
+        post.setStatus(PostStatus.PUBLISHED);
+        postRepository.save(post);
     }
 
-    public List<AiPost> getPostsForCurrentUser() {
+    public void deleteDraftPostsForCurrentUser() {
         User user = userService.getCurrentUser()
                 .orElseThrow(() -> new IllegalStateException("User not authenticated"));
-        return postRepository.findAllByUser(user);
+        postRepository.deleteByUserAndStatus(user, md.ceiti.cv.smm_generator.entity.PostStatus.DRAFT);
     }
 }

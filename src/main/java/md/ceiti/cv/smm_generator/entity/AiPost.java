@@ -17,25 +17,28 @@ public class AiPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String text;
 
+    @Column(columnDefinition = "TEXT")
     private String hashtags;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
 
+    @Column(length = 50)
     private String platform;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
 
-    private boolean published;
+    @Column(name = "published")
+    private LocalDateTime published;
 
-    @Column(name = "scheduled_date")
-    private LocalDateTime scheduledDate;
+    @Enumerated(EnumType.STRING)
+    private PostStatus status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

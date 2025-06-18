@@ -10,7 +10,7 @@ public class SmmGeneratorApplication {
     public static void main(String[] args) {
 
         Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
-        System.setProperty("OPENAI_API_KEY", dotenv.get("OPENAI_API_KEY"));
+        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
 
         SpringApplication.run(SmmGeneratorApplication.class, args);
     }

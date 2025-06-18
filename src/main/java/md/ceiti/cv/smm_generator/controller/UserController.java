@@ -27,15 +27,10 @@ public class UserController {
     public String dashboard() {
         return "user/dashboard";
     }
-//
-//    @GetMapping("/post_generate")
-//    public String post_generate() {
-//        return "user/post_generate";
-//    }
 
-    @GetMapping("/calendar")
-    public String calendar() {
-        return "user/calendar";
+    @GetMapping("/post_calendar")
+    public String postCalendar() {
+        return "user/post_calendar";
     }
 
     @GetMapping("/settings")

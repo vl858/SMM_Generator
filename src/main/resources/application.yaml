@@ -2,9 +2,12 @@ spring:
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-3.5-turbo
       image:
         options:
-          model: gpt-image-1
+          model: dall-e-3
           size: 1024x1024
-          quality: high
+          quality: hd
           response-format: url

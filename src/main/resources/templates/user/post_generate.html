@@ -15,15 +15,21 @@
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
 
         <div class="col-md-10 content-wrapper">
-            <!-- Formular generare -->
             <div class="generate-container">
                 <h2 class="mb-3">Generate AI-Powered Post</h2>
+
                 <div th:if="${facebookTokenExpired}" class="alert alert-warning">
                     Your Facebook token has expired.
                     <a th:href="@{/reauth/facebook}" class="alert-link">Click here to reconnect Facebook</a>.
                 </div>
 
                 <div id="formAlert" class="alert alert-danger d-none" role="alert"></div>
+
+                <div th:if="${message}" class="alert alert-dismissible fade show"
+                     th:classappend="'alert-' + ${alertType}" role="alert">
+                    <span th:text="${message}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
 
                 <form id="generateForm" th:action="@{/generate-posts}" method="post">
                     <div class="mb-3">
@@ -34,19 +40,19 @@
                 </form>
             </div>
 
-            <!-- Afișare postări generate -->
             <div class="results-wrapper mt-4" th:if="${posts != null and !posts.isEmpty()}">
                 <h4 class="mb-4">Choose your favorite AI-generated post</h4>
                 <div class="row g-4">
                     <div class="col-md-4" th:each="post : ${posts}">
                         <div class="card-post-result">
-                            <img th:src="${post.imageUrl}" alt="Generated Post" class="img-fluid mb-2">
+                            <img th:src="${post.imageUrl}" th:attr="id='img_' + ${post.id}" class="img-fluid mb-2" alt="Generated Post">
                             <p>
-                                <strong th:text="${post.text}"></strong><br>
-                                <small th:text="${post.hashtags}"></small>
+                                <small th:attr="id='text_' + ${post.id}" th:text="${post.text}"></small><br>
+                                <small th:attr="id='tags_' + ${post.id}" th:text="${post.hashtags}"></small>
                             </p>
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" th:data-bs-target="${'#editModal_' + post.id}">Edit</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                        th:data-bs-target="${'#editModal_' + post.id}">Edit</button>
                                 <button type="button" class="btn btn-success"
                                         data-bs-toggle="modal"
                                         th:data-bs-target="${'#publishModal_' + post.id}"
@@ -59,32 +65,41 @@
                 </div>
             </div>
 
-            <!-- Modaluri editare și publicare -->
             <div th:each="post : ${posts}">
-                <!-- Modal Edit -->
+                <!-- Edit Modal -->
                 <div th:id="${'editModal_' + post.id}" class="modal fade" tabindex="-1">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
-                            <form th:action="@{/edit-post}" method="post">
+                            <form th:action="@{/edit-post}" method="post"
+                                  class="edit-post-form"
+                                  th:attr="data-post-id=${post.id}">
                                 <input type="hidden" name="postId" th:value="${post.id}" />
+
                                 <div class="modal-header">
                                     <h5 class="modal-title">Edit Post</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
+
                                 <div class="modal-body">
                                     <div class="mb-3">
-                                        <label>Text</label>
-                                        <textarea name="text" class="form-control" th:text="${post.text}"></textarea>
+                                        <label class="form-label">Text</label>
+                                        <textarea name="text" class="form-control"
+                                                  th:text="${post.text}"></textarea>
                                     </div>
+
                                     <div class="mb-3">
-                                        <label>Hashtags</label>
-                                        <input name="hashtags" class="form-control" th:value="${post.hashtags}" />
+                                        <label class="form-label">Hashtags</label>
+                                        <input name="hashtags" class="form-control"
+                                               th:value="${post.hashtags}" />
                                     </div>
+
                                     <div class="mb-3">
-                                        <label>Image URL</label>
-                                        <input name="imageUrl" class="form-control" th:value="${post.imageUrl}" />
+                                        <label class="form-label">Image URL</label>
+                                        <input name="imageUrl" class="form-control"
+                                               th:value="${post.imageUrl}" />
                                     </div>
                                 </div>
+
                                 <div class="modal-footer">
                                     <button class="btn btn-primary">Save</button>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -94,69 +109,48 @@
                     </div>
                 </div>
 
-                <!-- Modal Publish -->
+                <!-- Publish Modal -->
                 <div th:id="${'publishModal_' + post.id}" class="modal fade" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <form th:action="@{/publish}" method="post">
                                 <input type="hidden" name="postId" th:value="${post.id}" />
+
                                 <div class="modal-header">
                                     <h5 class="modal-title">Publish Post</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
+
                                 <div class="modal-body">
                                     <p><strong th:text="${post.text}"></strong></p>
                                     <p><small th:text="${post.hashtags}"></small></p>
                                     <img th:src="${post.imageUrl}" class="img-fluid mb-3" alt="Generated image"/>
 
                                     <label class="form-label">Select Platforms:</label><br>
+
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" name="platforms" value="facebook" id="fb_${post.id}">
-                                        <label class="form-check-label" th:for="${'fb_' + post.id}">Facebook</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" name="platforms" value="instagram" id="ig_${post.id}">
-                                        <label class="form-check-label" th:for="${'ig_' + post.id}">Instagram</label>
-                                    </div>
-
-                                    <div class="form-check mt-3">
-                                        <input class="form-check-input publish-option" type="radio" name="publishOption" th:name="${'publishOption_' + post.id}" value="now" checked>
-                                        <label class="form-check-label">Publish Now</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input publish-option" type="radio" name="publishOption" th:name="${'publishOption_' + post.id}" value="schedule">
-                                        <label class="form-check-label">Schedule</label>
-                                    </div>
-
-                                    <div class="mb-3 schedule-date" style="display: none;">
-                                        <label class="form-label">Select date and time:</label>
-                                        <input type="datetime-local" name="scheduledDate" class="form-control">
+                                        <label class="form-check-label" for="fb_${post.id}">Facebook</label>
                                     </div>
                                 </div>
+
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn btn-success">Confirm</button>
+                                    <button type="submit" class="btn btn-success">Publish Now</button>
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
-
             </div>
+
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.querySelectorAll('.publish-option').forEach(input => {
-        input.addEventListener('change', function () {
-            const modal = this.closest('.modal');
-            const dateDiv = modal.querySelector('.schedule-date');
-            dateDiv.style.display = this.value === 'schedule' ? 'block' : 'none';
-        });
-    });
 
+<script>
     document.getElementById('generateForm').addEventListener('submit', function (e) {
         const topic = document.getElementById('topic').value.trim();
         const alertBox = document.getElementById('formAlert');
@@ -169,7 +163,43 @@
             alertBox.classList.add('d-none');
         }
     });
-</script>
 
+    document.querySelectorAll('.edit-post-form').forEach(form => {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const postId = form.getAttribute('data-post-id');
+
+            try {
+                const response = await fetch('/edit-post', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Update failed');
+
+                const newText = form.querySelector('[name="text"]').value;
+                const newTags = form.querySelector('[name="hashtags"]').value;
+                const newImageUrl = form.querySelector('[name="imageUrl"]').value;
+
+                document.getElementById(`text_${postId}`).innerText = newText;
+                document.getElementById(`tags_${postId}`).innerText = newTags;
+                document.getElementById(`img_${postId}`).src = newImageUrl;
+
+                const publishModal = document.getElementById(`publishModal_${postId}`);
+                publishModal.querySelector('strong').innerText = newText;
+                publishModal.querySelector('small').innerText = newTags;
+                publishModal.querySelector('img').src = newImageUrl;
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById(`editModal_${postId}`));
+                modal.hide();
+
+            } catch (error) {
+                alert("Failed to update post: " + error.message);
+            }
+        });
+    });
+</script>
 </body>
 </html>

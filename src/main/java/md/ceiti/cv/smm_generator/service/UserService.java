@@ -2,6 +2,7 @@ package md.ceiti.cv.smm_generator.service;
 
 import md.ceiti.cv.smm_generator.dto.UserDto;
 import md.ceiti.cv.smm_generator.entity.User;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,4 +22,6 @@ public interface UserService {
     boolean verifyPassword(String rawPassword, String encodedPassword);
 
     Optional<User> getCurrentUser();
+
+    Page<UserDto> findPaginatedSorted(int page, int size, String sortField);
 }

@@ -18,7 +18,7 @@
             <div class="w-100">
 
                 <h2 class="fw-bold text-center mb-3">Socials Accounts</h2>
-                <p class="text-muted text-center mb-5">Connect your Facebook and/or Instagram accounts to enable post publishing</p>
+                <p class="text-muted text-center mb-5">Connect your Facebook account to enable post publishing</p>
 
                 <div class="row justify-content-center">
 
@@ -28,27 +28,17 @@
                                 <i class="bi bi-facebook text-primary me-2"></i>Facebook
                             </h4>
 
-                            <div th:if="${facebookSuccess}" class="text-success mb-2" th:text="${facebookSuccess}"></div>
-                            <div th:if="${facebookError}" class="text-danger mb-2" th:text="${facebookError}"></div>
+                            <div th:if="${facebookSuccess}" class="mb-2 text-success">✅ Connected to Facebook</div>
+                            <div th:if="${facebookError}" class="mb-2 text-danger">❌ Not connected to Facebook</div>
+
+                            <div th:if="${facebookTokenExpired}" class="text-warning mb-2">
+                                ⚠ Facebook token has expired.
+                            </div>
+                            <a th:if="${facebookTokenExpired}" href="/reauth/facebook" class="btn btn-warning w-100 mb-2">Reconnect Facebook</a>
 
                             <a th:if="${!facebookConnected}" href="/oauth2/authorization/facebook" class="btn btn-primary w-100">Connect Facebook</a>
-                            <form th:if="${facebookConnected}" action="/disconnect/facebook" method="post">
-                                <button type="submit" class="btn btn-outline-danger w-100 mt-2">Disconnect</button>
-                            </form>
-                        </div>
-                    </div>
 
-                    <div class="col-md-5 mb-4">
-                        <div class="card-social text-center p-4">
-                            <h4 class="fw-semibold mb-2">
-                                <i class="bi bi-instagram text-danger me-2"></i>Instagram
-                            </h4>
-
-                            <div th:if="${instagramSuccess}" class="text-success mb-2" th:text="${instagramSuccess}"></div>
-                            <div th:if="${instagramError}" class="text-danger mb-2" th:text="${instagramError}"></div>
-
-                            <a th:if="${!instagramConnected}" href="/connect/instagram" class="btn btn-primary w-100">Connect Instagram</a>
-                            <form th:if="${instagramConnected}" action="/disconnect/instagram" method="post">
+                            <form th:if="${facebookConnected}" action="/disconnect/facebook" method="get">
                                 <button type="submit" class="btn btn-outline-danger w-100 mt-2">Disconnect</button>
                             </form>
                         </div>

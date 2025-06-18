@@ -10,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -38,9 +39,15 @@ public class AdminSeeder {
 
     @PostConstruct
     public void initAdmin() {
-        if (userRepository.findByEmail(adminEmail) == null) {
+        if (userRepository.findByEmail(adminEmail).isEmpty()) {
 
             Role adminRole = roleRepository.findByName("ROLE_ADMIN");
+            if (adminRole == null) {
+                adminRole = new Role();
+                adminRole.setName("ROLE_ADMIN");
+                adminRole.setUsers(new ArrayList<>());
+                roleRepository.save(adminRole);
+            }
 
             User admin = new User();
             admin.setName(adminFirstname + " " + adminLastname);
@@ -50,9 +57,9 @@ public class AdminSeeder {
 
             userRepository.save(admin);
 
-            System.out.println("Admin create automatically"+adminEmail);
+            System.out.println("Admin created automatically: " + adminEmail);
         } else {
-            System.out.println("Admin already exists" + adminEmail);
+            System.out.println("Admin already exists: " + adminEmail);
         }
     }
 }
