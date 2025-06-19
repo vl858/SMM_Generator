@@ -28,7 +28,7 @@ public class SocialController {
         if (optionalUser.isEmpty()) return "redirect:/login";
 
         User user = optionalUser.get();
-        boolean facebookConnected = user.getFacebookAccessToken() != null;
+        boolean facebookConnected = user.getFacebookPageToken() != null;
         boolean facebookExpired = facebookConnected && tokenValidatorService.isFacebookTokenExpired(user);
 
         model.addAttribute("facebookConnected", facebookConnected);
@@ -58,8 +58,8 @@ public class SocialController {
     @GetMapping("/disconnect/facebook")
     public String disconnectFacebook(Principal principal, RedirectAttributes redirectAttributes) {
         userRepository.findByEmail(principal.getName()).ifPresent(user -> {
-            user.setFacebookAccessToken(null);
-            user.setFacebookUserId(null);
+            user.setFacebookPageToken(null);
+            user.setFacebookPageId(null);
             userRepository.save(user);
             redirectAttributes.addFlashAttribute("facebookSuccess", "🔌 Facebook disconnected.");
         });

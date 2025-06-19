@@ -28,14 +28,15 @@ public class AiPostCalendarController {
         List<Map<String, Object>> events = new ArrayList<>();
 
         for (AiPost post : posts) {
+            Map<String, Object> extendedProps = new HashMap<>();
+            extendedProps.put("hashtags", post.getHashtags());
+            extendedProps.put("platform", post.getPlatform());
+
             Map<String, Object> event = new HashMap<>();
             event.put("title", post.getText());
             event.put("start", post.getPublished());
-            event.put("extendedProps", Map.of(
-                    "hashtags", post.getHashtags(),
-                    "platform", post.getPlatform(),
-                    "image", post.getImageUrl()
-            ));
+            event.put("extendedProps", extendedProps);
+
             events.add(event);
         }
 

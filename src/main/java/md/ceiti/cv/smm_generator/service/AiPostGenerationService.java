@@ -66,7 +66,7 @@ public class AiPostGenerationService {
     public String generateHashtags(String topic) {
         return chatClientBuilder.build()
                 .prompt()
-                .user("Generate 5 relevant hashtags for: " + topic + ". Output as space-separated line.")
+                .user("Generate 4 relevant hashtags for: " + topic + ". Output as space-separated line.")
                 .call()
                 .content();
     }

@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class TokenValidatorService {
     public boolean isFacebookTokenExpired(User user) {
-        String token = user.getFacebookAccessToken();
+        String token = user.getFacebookPageToken();
         if (token == null) return true;
 
         try {

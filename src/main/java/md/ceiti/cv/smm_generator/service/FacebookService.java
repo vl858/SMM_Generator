@@ -25,9 +25,9 @@ public class FacebookService {
         User user = post.getUser();
 
         if (user.getFacebookTokenExpiry() != null && user.getFacebookTokenExpiry().isBefore(LocalDateTime.now())) {
-            String refreshedToken = facebookOAuthHelper.exchangeForLongLivedToken(user.getFacebookAccessToken());
+            String refreshedToken = facebookOAuthHelper.exchangeForLongLivedToken(user.getFacebookPageToken());
             if (refreshedToken != null) {
-                user.setFacebookAccessToken(refreshedToken);
+                user.setFacebookPageToken(refreshedToken);
 
                 LocalDateTime realExpiry = facebookOAuthHelper.getRealTokenExpiry(refreshedToken);
                 user.setFacebookTokenExpiry(Objects.requireNonNullElseGet(realExpiry, () -> LocalDateTime.now().plusDays(60)));
@@ -38,14 +38,17 @@ public class FacebookService {
             }
         }
 
-        String accessToken = user.getFacebookAccessToken();
-        String pageId = user.getFacebookUserId();
+        String accessToken = user.getFacebookPageToken();
+        String pageId = user.getFacebookPageId();
 
         if (accessToken == null || pageId == null) {
+            System.out.println("Facebook page token or ID is null");
+            System.out.println("Token: " + accessToken);
+            System.out.println("Page ID: " + pageId);
             throw new IllegalStateException("Facebook account not connected properly. Please reconnect your account.");
         }
 
-        String url = "https://graph.facebook.com/" + pageId + "/feed";
+        String url = "https://graph.facebook.com/" + pageId + "/photos";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

@@ -32,10 +32,10 @@ public class User {
     private String password;
 
     @Column(name = "facebook_page_id")
-    private String facebookUserId;
+    private String facebookPageId;
 
     @Column(name = "facebook_page_token")
-    private String facebookAccessToken;
+    private String facebookPageToken;
 
     @Column(name = "facebook_token_expiry")
     private LocalDateTime facebookTokenExpiry;

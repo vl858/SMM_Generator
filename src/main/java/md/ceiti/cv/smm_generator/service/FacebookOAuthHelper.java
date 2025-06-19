@@ -54,10 +54,11 @@ public class FacebookOAuthHelper {
             if (userOpt.isEmpty()) return;
 
             User user = userOpt.get();
-            user.setFacebookAccessToken(longLivedToken);
+            user.setFacebookPageToken(longLivedToken);
 
             LocalDateTime realExpiry = getRealTokenExpiry(longLivedToken);
             user.setFacebookTokenExpiry(realExpiry != null ? realExpiry : LocalDateTime.now().plusDays(60));
+            saveFacebookPageInfo(user, longLivedToken);
 
             userRepository.save(user);
 
@@ -110,5 +111,36 @@ public class FacebookOAuthHelper {
             System.out.println("Failed to fetch real expiry: " + e.getMessage());
         }
         return null;
+    }
+
+    public void saveFacebookPageInfo(User user, String userAccessToken) {
+        String url = "https://graph.facebook.com/v19.0/me/accounts?access_token=" + userAccessToken;
+
+        try {
+            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            Map<String, Object> body = response.getBody();
+
+            if (body != null && body.containsKey("data")) {
+                List<Map<String, Object>> pages = (List<Map<String, Object>>) body.get("data");
+
+                if (!pages.isEmpty()) {
+                    Map<String, Object> page = pages.get(0);
+
+                    String pageId = (String) page.get("id");
+                    String pageAccessToken = (String) page.get("access_token");
+
+                    user.setFacebookPageId(pageId);
+                    user.setFacebookPageToken(pageAccessToken);
+
+                    userRepository.save(user);
+                } else {
+                    System.out.println("No Facebook pages found for user.");
+                }
+            } else {
+                System.out.println("Facebook pages fetch failed. No data returned.");
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to fetch Facebook pages: " + e.getMessage());
+        }
     }
 }
